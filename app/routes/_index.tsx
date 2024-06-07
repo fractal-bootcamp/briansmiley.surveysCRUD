@@ -1,12 +1,16 @@
 import type { MetaFunction } from "@remix-run/node";
-
+import { Link } from "@remix-run/react";
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
+    { title: "Survey App" },
     { name: "description", content: "Welcome to Remix!" }
   ];
 };
 
 export default function Index() {
-  return <div className="text-5xl text-red-500">Surveys</div>;
+  return (
+    <div className="text-5xl text-teal-500 underline">
+      <Link to="/surveys">Surveys</Link>
+    </div>
+  );
 }
