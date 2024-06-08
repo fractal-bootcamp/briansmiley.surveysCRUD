@@ -1,12 +1,8 @@
 import { fetcher } from "./surveys._index";
 import { Survey, Question } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node"; // or cloudflare/deno
-import { useLoaderData } from "@remix-run/react";
+import { useParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  return params.surveyId;
-};
 type SingleSurveyFetchResponse = { survey: Survey };
 type QuestionListFetchResponse = { questions: Question[] };
 type SurveyWithQuestionsFetchResponse = {
@@ -28,10 +24,14 @@ const fetchSurvey = async (
   return { survey, questions };
 };
 
-export default function SurveyList() {
+export default function SurveyFilloutForm() {
   const [surveyName, setSurveyName] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
-  const surveyId = useLoaderData<typeof loader>();
+  const params = useParams();
+  if (!params.surveyId) throw new Error("invalid surveyId");
+  const surveyId = params.surveyId;
+
+  //
   useEffect(() => {
     const asyncGetSurveys = async () => {
       const { survey, questions } = await fetchSurvey(surveyId);
@@ -40,6 +40,7 @@ export default function SurveyList() {
     };
     asyncGetSurveys();
   }, []);
+
   if (surveyId === null) throw new Error("Invalid surveyId");
   return (
     <div>
