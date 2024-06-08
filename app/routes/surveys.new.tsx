@@ -24,13 +24,20 @@ const addNewSurveyToDatabase = async (survey: NewSurveyParams) => {
 
 export default function NewSurveyForm() {
   const [surveyName, setSurveyName] = useState("");
+  const [questions, setQuestions] = useState<string[]>([""]);
   const clickSubmitFunction = (surveyName: string) => () => {
     addNewSurveyToDatabase({ name: surveyName });
     setSurveyName("");
   };
-
+  const updateQuestionByIndexFunction = (idx: number, newQuestion: string) =>
+    setQuestions(
+      questions.map((question, questionIndex) =>
+        questionIndex === idx ? newQuestion : question
+      )
+    );
+  const addNewQuestion = () => setQuestions(questions.concat([""]));
   return (
-    <div className="">
+    <div className="flex flex-col gap-2">
       <div className="m-2 flex gap-2">
         <label htmlFor="Survey Name">Survey Name</label>
         <input
@@ -42,10 +49,32 @@ export default function NewSurveyForm() {
             setSurveyName(e.target.value);
           }}
         ></input>
-        <button className="btn" onClick={clickSubmitFunction(surveyName)}>
-          Create
-        </button>
       </div>
+
+      <div>
+        {questions.map((question, idx) => {
+          return (
+            <div className="m-2 flex gap-2" key={idx}>
+              <label htmlFor={`Question ${idx}`}>{`Question ${idx + 1}`}</label>
+              <input
+                className="inp"
+                type="text"
+                name={`question${idx}`}
+                value={question}
+                onChange={e =>
+                  updateQuestionByIndexFunction(idx, e.target.value)
+                }
+              ></input>
+            </div>
+          );
+        })}
+      </div>
+      <button className="btn w-20" onClick={addNewQuestion}>
+        Add Question
+      </button>
+      <button className="btn w-20" onClick={clickSubmitFunction(surveyName)}>
+        Create
+      </button>
     </div>
   );
 }
