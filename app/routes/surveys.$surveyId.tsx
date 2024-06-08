@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { Link } from "@remix-run/react";
+
 const prisma = new PrismaClient();
 
 import type { LoaderFunctionArgs } from "@remix-run/node"; // or cloudflare/deno
@@ -7,19 +7,20 @@ import { json } from "@remix-run/node"; // or cloudflare/deno
 import { useLoaderData } from "@remix-run/react";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const surveys = await prisma.survey.findMany();
-  return surveys;
+  // const survey = await prisma.survey.findUnique({
+  //   where: {
+  //     id: params.surveyId
+  //   }
+  // });
+  return params.surveyId;
 };
-export default function SurveyList() {
-  const surveys = useLoaderData<typeof loader>();
+
+export default function Survey() {
+  const survey = useLoaderData<typeof loader>();
+  if (survey === null) throw new Error("Invalid surveyId");
   return (
     <div>
-      <div>
-        {surveys.map(survey => (
-          <Link to={`/surveys/${survey.id}`}>{survey.name}</Link>
-        ))}
-      </div>
-      ;
+      <div>test {survey}</div>;
     </div>
   );
 }
