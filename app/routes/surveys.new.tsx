@@ -1,5 +1,5 @@
 import { Question, Survey } from "@prisma/client";
-import { useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useState } from "react";
 
 export type NewSurvey = Omit<Survey, "id">;
 export type NewQuestion = Omit<Question, "id" | "surveyId">;
@@ -69,22 +69,16 @@ export default function NewSurveyForm() {
       </div>
 
       <div>
-        {questions.map((question, idx) => {
-          return (
-            <div className="m-2 flex gap-2" key={idx}>
-              <label htmlFor={`Question ${idx}`}>{`Question ${idx + 1}`}</label>
-              <input
-                className="inp"
-                type="text"
-                name={`question${idx}`}
-                value={question}
-                onChange={e =>
-                  updateQuestionByIndexFunction(idx, e.target.value)
-                }
-              />
-            </div>
-          );
-        })}
+        {questions.map((question, idx) => (
+          <QuestionRow
+            question={question}
+            index={idx}
+            onChangeFunction={e =>
+              updateQuestionByIndexFunction(idx, e.target.value)
+            }
+            key={idx.toString()}
+          />
+        ))}
       </div>
       <button className="btn w-fit" onClick={addNewQuestion}>
         Add Question
@@ -95,3 +89,28 @@ export default function NewSurveyForm() {
     </div>
   );
 }
+
+type QuestionRowProps = {
+  question: string;
+  index: number;
+  onChangeFunction: ChangeEventHandler<HTMLInputElement>;
+};
+
+const QuestionRow = ({
+  question,
+  index,
+  onChangeFunction
+}: QuestionRowProps) => {
+  return (
+    <div className="m-2 flex gap-2" key={index}>
+      <label htmlFor={`Question ${index}`}>{`Question ${index + 1}`}</label>
+      <input
+        className="inp"
+        type="text"
+        name={`question${index}`}
+        value={question}
+        onChange={onChangeFunction}
+      />
+    </div>
+  );
+};
