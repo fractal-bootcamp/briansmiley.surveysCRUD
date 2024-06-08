@@ -23,7 +23,7 @@ const PageLink = ({ setCurrent, url, label, isCurrent }: PageLinkProps) => {
     : "hover:bg-teal-800";
   return (
     <Link
-      className={`${selectionDependentClass} p-4 text-white hover:text-gray-100 `}
+      className={`${selectionDependentClass} p-4 text-white hover:text-gray-100`}
       to={url}
       onClick={setCurrent}
     >
@@ -35,7 +35,7 @@ export default function Sidebar() {
   const [currentPage, setCurrentPage] = useState("/");
 
   return (
-    <div className=" text-xl text-white flex flex-col bg-teal-700 h-full w-fit  gap-1s">
+    <div className=" text-xl text-white flex flex-col bg-teal-700 h-full w-fit shrink-0 gap-1s">
       {pages.map(pageInfo => (
         <PageLink
           {...pageInfo}
