@@ -2,22 +2,19 @@ import { PrismaClient, Survey } from "@prisma/client";
 import { Link } from "@remix-run/react";
 const prisma = new PrismaClient();
 
-import type { LoaderFunctionArgs } from "@remix-run/node"; // or cloudflare/deno
-import { json } from "@remix-run/node"; // or cloudflare/deno
-import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
-type SurveyFetchResponse = { surveys: Survey[] };
+type SurveyNamesListFetchResponse = { surveys: Survey[] };
 
 const fetchSurveys = async () => {
-  const surveyData = await fetcher<SurveyFetchResponse>(() =>
+  const surveyData = await fetcher<SurveyNamesListFetchResponse>(() =>
     fetch("http://localhost:4000/surveys")
   );
 
   return surveyData.surveys;
 };
 
-const fetcher = async <T,>(
+export const fetcher = async <T,>(
   fetchFn: () => Promise<Response>, //fetch call to run
   onError?: () => void //optional error handler
 ) => {
@@ -50,7 +47,6 @@ export default function SurveyList() {
     asyncSetSurveys();
   }, []);
 
-  console.log(surveys);
   return (
     <div className="flex flex-col ">
       {surveys.map(survey => (
