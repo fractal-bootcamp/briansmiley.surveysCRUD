@@ -19,13 +19,13 @@ model Survey {
 }
 
 model Question {
-  id       String     @id @default(cuid())
+  id       String           @id @default(cuid())
   question String
   content  String
-  response Response[]
+  response SurveyResponse[]
 }
 
-model Response {
+model SurveyResponse {
   id         String   @id @default(cuid())
   question   Question @relation(fields: [questionId], references: [id])
   questionId String
