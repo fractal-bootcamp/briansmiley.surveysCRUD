@@ -133,9 +133,9 @@ const QuestionRow = ({
         value={question}
         onChange={onChangeFunction}
       />
-      <div className="flex items-center">
+      <div className="flex items-center h-full">
         <button
-          className="btn bg-red-400 hover:bg-red-600 h-[75%] w-6"
+          className="btn bg-red-400 hover:bg-red-600 h-[25px] w-6"
           onClick={deleteQuestionFunction}
         >
           -
