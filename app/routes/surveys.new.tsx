@@ -52,7 +52,11 @@ export default function NewSurveyForm() {
 
   //Add a new, empty, question to state
   const addNewQuestion = () => setQuestions(questions.concat([""]));
-
+  const deleteQuestionByIdFunction = (deleteAtIndex: number) => () => {
+    const newQuestions = [...questions];
+    newQuestions.splice(deleteAtIndex, 1);
+    setQuestions(newQuestions);
+  };
   return (
     <div className="flex flex-col gap-2">
       <div className="m-2 flex gap-2">
@@ -76,6 +80,7 @@ export default function NewSurveyForm() {
             onChangeFunction={e =>
               updateQuestionByIndexFunction(idx, e.target.value)
             }
+            deleteQuestionFunction={deleteQuestionByIdFunction(idx)}
             key={idx.toString()}
           />
         ))}
@@ -94,12 +99,14 @@ type QuestionRowProps = {
   question: string;
   index: number;
   onChangeFunction: ChangeEventHandler<HTMLInputElement>;
+  deleteQuestionFunction: () => void;
 };
 
 const QuestionRow = ({
   question,
   index,
-  onChangeFunction
+  onChangeFunction,
+  deleteQuestionFunction
 }: QuestionRowProps) => {
   return (
     <div className="m-2 flex gap-2" key={index}>
@@ -111,6 +118,9 @@ const QuestionRow = ({
         value={question}
         onChange={onChangeFunction}
       />
+      <button className="btn w-8 bg-red-300" onClick={deleteQuestionFunction}>
+        -
+      </button>
     </div>
   );
 };
