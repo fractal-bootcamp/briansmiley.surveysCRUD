@@ -23,7 +23,7 @@ const PageLink = ({ setCurrent, url, label, isCurrent }: PageLinkProps) => {
     : "hover:bg-teal-800";
   return (
     <Link
-      className={`${selectionDependentClass} p-4 `}
+      className={`${selectionDependentClass} p-4 text-white hover:text-gray-100 `}
       to={url}
       onClick={setCurrent}
     >

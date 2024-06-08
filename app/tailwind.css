@@ -2,14 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  height: 100%;
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+  a {
+    @apply lnk;
+  }
+  h1 {
+    @apply font-semibold text-2xl;
+  }
 }
-.inp {
-  @apply border border-gray-600 rounded-md px-1;
-}
-
-.btn {
-  @apply border border-gray-500 py-0.5 px-1 rounded-md bg-slate-100 hover:bg-slate-200;
+@layer components {
+  .inp {
+    @apply border border-gray-600 rounded-md px-2 py-1;
+  }
+  .lnk {
+    @apply text-teal-500 hover:text-teal-600 underline;
+  }
+  .btn {
+    @apply border border-gray-500 flex items-center justify-center py-0.5 px-3 rounded-md bg-slate-100 hover:bg-slate-200 min-w-6 w-fit;
+  }
 }

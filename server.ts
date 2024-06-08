@@ -3,11 +3,30 @@ import { Question, Survey, SurveyResponse } from "@prisma/client";
 import { NewSurveyPostParams } from "~/routes/surveys.new";
 import prisma from "~/client";
 import cors from "cors";
+import { SurveyResponsePostBody } from "~/routes/surveys.$surveyId";
 const app = express();
 const port = 4000;
 
 app.use(cors());
 app.use(express.json());
+
+app.post(
+  "/answers/submit",
+  async (req: Request<{}, {}, SurveyResponsePostBody>, res: Response) => {
+    const body = req.body;
+    console.log(body);
+    const { answers } = body;
+    const newlyCreatedAnswers = [];
+    for (const newAnswer of answers) {
+      const createdAnswer = await prisma.surveyResponse.create({
+        data: newAnswer
+      });
+      newlyCreatedAnswers.push(createdAnswer);
+    }
+    console.log(newlyCreatedAnswers);
+    res.json(newlyCreatedAnswers);
+  }
+);
 
 //create a new survey
 app.post(

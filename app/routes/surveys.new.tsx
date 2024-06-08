@@ -24,7 +24,7 @@ export default function NewSurveyForm() {
   const [questions, setQuestions] = useState<string[]>([""]);
 
   //on-click to send the state variables off to db
-  const clickSubmitFunction = () => () => {
+  const clickSubmitFunction = () => {
     //turn questions array into array of Question-table-ready-objects and the survey name into a Survey-Table-Ready object
     const preppedSurvey = { name: surveyName };
     const preppedQuestions: NewQuestion[] = questions.map((question, idx) => ({
@@ -43,12 +43,25 @@ export default function NewSurveyForm() {
   };
 
   //controlled-input function that correlates a quesiton's input field with its element in the questions state array
-  const updateQuestionByIndexFunction = (idx: number, newQuestion: string) =>
+  const updateQuestionByIndexFunction = (
+    idx: number,
+    textarea: HTMLTextAreaElement
+  ) => {
+    const newQuestion = textarea.value;
+    const maxTextareaHeight = 300;
+    //Resize textarea to fit question (to a point)
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(
+      textarea.scrollHeight,
+      maxTextareaHeight
+    )}px`;
+    //set questions to new content
     setQuestions(
       questions.map((question, questionIndex) =>
         questionIndex === idx ? newQuestion : question
       )
     );
+  };
 
   //Add a new, empty, question to state
   const addNewQuestion = () => setQuestions(questions.concat([""]));
@@ -58,28 +71,26 @@ export default function NewSurveyForm() {
     setQuestions(newQuestions);
   };
   return (
-    <div className="flex flex-col gap-2">
-      <div className="m-2 flex gap-2">
-        <label htmlFor="Survey Name">Survey Name</label>
+    <div className="flex flex-col gap-2 p-2">
+      <div className=" flex gap-2 items-center mb-2">
+        <label htmlFor="surveyName" className="shrink-0">
+          Survey Name:
+        </label>
         <input
           className="inp"
           type="text"
-          name="surveyName"
+          id="surveyName"
           value={surveyName}
-          onChange={e => {
-            setSurveyName(e.target.value);
-          }}
+          onChange={e => setSurveyName(e.target.value)}
         ></input>
       </div>
 
-      <div>
+      <div className="flex flex-col gap-2">
         {questions.map((question, idx) => (
           <QuestionRow
             question={question}
             index={idx}
-            onChangeFunction={e =>
-              updateQuestionByIndexFunction(idx, e.target.value)
-            }
+            onChangeFunction={e => updateQuestionByIndexFunction(idx, e.target)}
             deleteQuestionFunction={deleteQuestionByIdFunction(idx)}
             key={idx.toString()}
           />
@@ -88,7 +99,7 @@ export default function NewSurveyForm() {
       <button className="btn w-fit" onClick={addNewQuestion}>
         Add Question
       </button>
-      <button className="btn w-20" onClick={clickSubmitFunction()}>
+      <button className="btn w-20" onClick={clickSubmitFunction}>
         Submit
       </button>
     </div>
@@ -98,7 +109,7 @@ export default function NewSurveyForm() {
 type QuestionRowProps = {
   question: string;
   index: number;
-  onChangeFunction: ChangeEventHandler<HTMLInputElement>;
+  onChangeFunction: ChangeEventHandler<HTMLTextAreaElement>;
   deleteQuestionFunction: () => void;
 };
 
@@ -109,18 +120,25 @@ const QuestionRow = ({
   deleteQuestionFunction
 }: QuestionRowProps) => {
   return (
-    <div className="m-2 flex gap-2" key={index}>
-      <label htmlFor={`Question ${index}`}>{`Question ${index + 1}`}</label>
-      <input
-        className="inp"
-        type="text"
-        name={`question${index}`}
+    <div className=" flex gap-2 items-start">
+      <label
+        htmlFor={`question${index}`}
+        className="shrink-0 w-[6em]"
+      >{`Question ${index + 1}:`}</label>
+      <textarea
+        className=" inp w-[400px] min-h-[60px]"
+        id={`question${index}`}
         value={question}
         onChange={onChangeFunction}
       />
-      <button className="btn w-8 bg-red-300" onClick={deleteQuestionFunction}>
-        -
-      </button>
+      <div className="flex items-center h-full">
+        <button
+          className="btn bg-red-400 hover:bg-red-600 h-[25px] w-6"
+          onClick={deleteQuestionFunction}
+        >
+          -
+        </button>
+      </div>
     </div>
   );
 };
