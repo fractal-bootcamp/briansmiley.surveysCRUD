@@ -50,7 +50,6 @@ export default function SurveyList() {
     asyncSetSurveys();
   }, []);
 
-  console.log(surveys);
   return (
     <div className="flex flex-col ">
       {surveys.map(survey => (
