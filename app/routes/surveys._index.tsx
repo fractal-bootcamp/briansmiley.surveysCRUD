@@ -48,13 +48,11 @@ export default function SurveyList() {
   }, []);
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col  gap-2 m-2 ">
       {surveys.map(survey => (
-        <div>
-          <Link className="" to={`/surveys/${survey.id}`}>
-            {survey.name}
-          </Link>
-        </div>
+        <Link className="lnk" to={`/surveys/${survey.id}`}>
+          {survey.name}
+        </Link>
       ))}
     </div>
   );
