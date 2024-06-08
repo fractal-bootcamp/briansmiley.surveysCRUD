@@ -73,7 +73,10 @@ export default function SurveyFilloutForm() {
       const { survey, questions } = await fetchSurvey(surveyId);
       setSurveyName(survey.name);
       setQuestions(questions);
-      resetAnswersState();
+      const newAnswers = Array.from(questions, question =>
+        newEmptySurveyResponseLocal(question.id)
+      );
+      setAnswers(newAnswers);
     };
     asyncGetSurveys();
   }, []);
@@ -113,7 +116,9 @@ export default function SurveyFilloutForm() {
             answer => answer.questionId === question.id
           );
           if (!questionAnswer)
-            throw new Error("Answer-question mismatch error");
+            throw new Error(
+              `Failed a lookup of answer <===> question on question ${question.id}, answer array is currently ${answers.length} long`
+            );
           return (
             <QuestionResponseRow
               question={question}
