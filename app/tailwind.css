@@ -7,6 +7,9 @@
   body {
     height: 100%;
   }
+  a {
+    @apply lnk;
+  }
 }
 @layer components {
   .inp {
