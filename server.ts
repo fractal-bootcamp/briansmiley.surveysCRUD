@@ -10,10 +10,7 @@ app.use(express.json());
 
 app.post(
   "/create",
-  async (
-    req: express.Request<{}, {}, Omit<Survey, "id">>,
-    res: express.Response
-  ) => {
+  async (req: Request<{}, {}, Omit<Survey, "id">>, res: Response) => {
     if (!req.body.name) res.status(400).send();
     const newSurvey = await prisma.survey.create({
       data: req.body
