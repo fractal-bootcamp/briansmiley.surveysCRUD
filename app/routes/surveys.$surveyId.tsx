@@ -120,6 +120,7 @@ export default function SurveyFilloutForm() {
           );
         })}
       </div>
+      <button className="btn">Submit Answers</button>
     </div>
   );
 }
@@ -137,7 +138,10 @@ const QuestionResponseRow = ({
   return (
     <div className="flex flex-col">
       <div>
-        <label htmlFor={`answer${question.questionNumber}`}>
+        <label
+          htmlFor={`answer${question.questionNumber}`}
+          className="text-xl text-slate-500"
+        >
           Question {questionNumber}: {question.content}
         </label>
       </div>
