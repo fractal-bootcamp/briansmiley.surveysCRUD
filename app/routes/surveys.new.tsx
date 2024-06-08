@@ -43,12 +43,25 @@ export default function NewSurveyForm() {
   };
 
   //controlled-input function that correlates a quesiton's input field with its element in the questions state array
-  const updateQuestionByIndexFunction = (idx: number, newQuestion: string) =>
+  const updateQuestionByIndexFunction = (
+    idx: number,
+    textarea: HTMLTextAreaElement
+  ) => {
+    const newQuestion = textarea.value;
+    const maxTextareaHeight = 300;
+    //Resize textarea to fit question (to a point)
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(
+      textarea.scrollHeight,
+      maxTextareaHeight
+    )}px`;
+    //set questions to new content
     setQuestions(
       questions.map((question, questionIndex) =>
         questionIndex === idx ? newQuestion : question
       )
     );
+  };
 
   //Add a new, empty, question to state
   const addNewQuestion = () => setQuestions(questions.concat([""]));
@@ -59,9 +72,9 @@ export default function NewSurveyForm() {
   };
   return (
     <div className="flex flex-col gap-2 p-2">
-      <div className=" flex gap-2">
+      <div className=" flex gap-2 items-center mb-2">
         <label htmlFor="surveyName" className="shrink-0">
-          Survey Name
+          Survey Name:
         </label>
         <input
           className="inp"
@@ -79,9 +92,7 @@ export default function NewSurveyForm() {
           <QuestionRow
             question={question}
             index={idx}
-            onChangeFunction={e =>
-              updateQuestionByIndexFunction(idx, e.target.value)
-            }
+            onChangeFunction={e => updateQuestionByIndexFunction(idx, e.target)}
             deleteQuestionFunction={deleteQuestionByIdFunction(idx)}
             key={idx.toString()}
           />
@@ -100,7 +111,7 @@ export default function NewSurveyForm() {
 type QuestionRowProps = {
   question: string;
   index: number;
-  onChangeFunction: ChangeEventHandler<HTMLInputElement>;
+  onChangeFunction: ChangeEventHandler<HTMLTextAreaElement>;
   deleteQuestionFunction: () => void;
 };
 
@@ -111,24 +122,25 @@ const QuestionRow = ({
   deleteQuestionFunction
 }: QuestionRowProps) => {
   return (
-    <div className=" flex gap-2 items-center">
+    <div className=" flex gap-2 items-start">
       <label
         htmlFor={`question${index}`}
         className="shrink-0 w-[6em]"
       >{`Question ${index + 1}:`}</label>
-      <input
-        className="inp"
-        type="text"
+      <textarea
+        className=" inp w-[400px] min-h-[60px]"
         id={`question${index}`}
         value={question}
         onChange={onChangeFunction}
       />
-      <button
-        className="btn bg-red-400 hover:bg-red-600 h-[75%] w-6"
-        onClick={deleteQuestionFunction}
-      >
-        -
-      </button>
+      <div className="flex items-center">
+        <button
+          className="btn bg-red-400 hover:bg-red-600 h-[75%] w-6"
+          onClick={deleteQuestionFunction}
+        >
+          -
+        </button>
+      </div>
     </div>
   );
 };
