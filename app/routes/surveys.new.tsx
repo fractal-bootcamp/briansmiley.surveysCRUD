@@ -1,5 +1,5 @@
 import { Question, Survey } from "@prisma/client";
-import { useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useState } from "react";
 
 export type NewSurvey = Omit<Survey, "id">;
 export type NewQuestion = Omit<Question, "id" | "surveyId">;
@@ -52,7 +52,11 @@ export default function NewSurveyForm() {
 
   //Add a new, empty, question to state
   const addNewQuestion = () => setQuestions(questions.concat([""]));
-
+  const deleteQuestionByIdFunction = (deleteAtIndex: number) => () => {
+    const newQuestions = [...questions];
+    newQuestions.splice(deleteAtIndex, 1);
+    setQuestions(newQuestions);
+  };
   return (
     <div className="flex flex-col gap-2">
       <div className="m-2 flex gap-2">
@@ -69,22 +73,17 @@ export default function NewSurveyForm() {
       </div>
 
       <div>
-        {questions.map((question, idx) => {
-          return (
-            <div className="m-2 flex gap-2" key={idx}>
-              <label htmlFor={`Question ${idx}`}>{`Question ${idx + 1}`}</label>
-              <input
-                className="inp"
-                type="text"
-                name={`question${idx}`}
-                value={question}
-                onChange={e =>
-                  updateQuestionByIndexFunction(idx, e.target.value)
-                }
-              />
-            </div>
-          );
-        })}
+        {questions.map((question, idx) => (
+          <QuestionRow
+            question={question}
+            index={idx}
+            onChangeFunction={e =>
+              updateQuestionByIndexFunction(idx, e.target.value)
+            }
+            deleteQuestionFunction={deleteQuestionByIdFunction(idx)}
+            key={idx.toString()}
+          />
+        ))}
       </div>
       <button className="btn w-fit" onClick={addNewQuestion}>
         Add Question
@@ -95,3 +94,33 @@ export default function NewSurveyForm() {
     </div>
   );
 }
+
+type QuestionRowProps = {
+  question: string;
+  index: number;
+  onChangeFunction: ChangeEventHandler<HTMLInputElement>;
+  deleteQuestionFunction: () => void;
+};
+
+const QuestionRow = ({
+  question,
+  index,
+  onChangeFunction,
+  deleteQuestionFunction
+}: QuestionRowProps) => {
+  return (
+    <div className="m-2 flex gap-2" key={index}>
+      <label htmlFor={`Question ${index}`}>{`Question ${index + 1}`}</label>
+      <input
+        className="inp"
+        type="text"
+        name={`question${index}`}
+        value={question}
+        onChange={onChangeFunction}
+      />
+      <button className="btn w-8 bg-red-300" onClick={deleteQuestionFunction}>
+        -
+      </button>
+    </div>
+  );
+};
