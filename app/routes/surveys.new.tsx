@@ -28,7 +28,7 @@ export default function NewSurveyForm() {
     //turn questions array into array of Question-table-ready-objects and the survey name into a Survey-Table-Ready object
     const preppedSurvey = { name: surveyName };
     const preppedQuestions: NewQuestion[] = questions.map((question, idx) => ({
-      questionNumber: idx,
+      questionNumber: idx + 1,
       content: question
     }));
 
