@@ -37,7 +37,7 @@ const fetchSurvey = async (
 const postResponsesToDatabase = async (
   newSurveyResponses: SurveyResponsePostBody
 ) => {
-  const response = await fetch(`http://localhost:4000/answers`, {
+  const response = await fetch(`http://localhost:4000/answers/submit`, {
     method: "POST",
     body: JSON.stringify(newSurveyResponses),
     headers: new Headers({ "content-type": "application/json" })
@@ -46,7 +46,7 @@ const postResponsesToDatabase = async (
   if (response.ok) return await response.text();
   else return response.statusText;
 };
-const newSurveyResponseLocal = (
+const newEmptySurveyResponseLocal = (
   questionId: Question["id"]
 ): SurveyResponseLocal => ({
   questionId: questionId,
@@ -57,7 +57,12 @@ export default function SurveyFilloutForm() {
   const [surveyName, setSurveyName] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<SurveyResponseLocal[]>([]);
-
+  const resetAnswersState = () => {
+    const newAnswers = Array.from(questions, question =>
+      newEmptySurveyResponseLocal(question.id)
+    );
+    setAnswers(newAnswers);
+  };
   const params = useParams();
   if (!params.surveyId) throw new Error("invalid surveyId");
   const surveyId = params.surveyId;
@@ -68,10 +73,7 @@ export default function SurveyFilloutForm() {
       const { survey, questions } = await fetchSurvey(surveyId);
       setSurveyName(survey.name);
       setQuestions(questions);
-      const newAnswers = Array.from(questions, question =>
-        newSurveyResponseLocal(question.id)
-      );
-      setAnswers(newAnswers);
+      resetAnswersState();
     };
     asyncGetSurveys();
   }, []);
@@ -98,6 +100,10 @@ export default function SurveyFilloutForm() {
       )
     );
   };
+  const submitSurveyAnswersButtonFunction = () => {
+    postResponsesToDatabase({ answers });
+    resetAnswersState();
+  };
   return (
     <div className="flex flex-col m-2 gap-2">
       <h1>{surveyName}</h1>
@@ -120,7 +126,9 @@ export default function SurveyFilloutForm() {
           );
         })}
       </div>
-      <button className="btn">Submit Answers</button>
+      <button className="btn" onClick={submitSurveyAnswersButtonFunction}>
+        Submit Answers
+      </button>
     </div>
   );
 }

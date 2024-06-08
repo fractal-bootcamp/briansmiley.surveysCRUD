@@ -24,7 +24,7 @@ export default function NewSurveyForm() {
   const [questions, setQuestions] = useState<string[]>([""]);
 
   //on-click to send the state variables off to db
-  const clickSubmitFunction = () => () => {
+  const clickSubmitFunction = () => {
     //turn questions array into array of Question-table-ready-objects and the survey name into a Survey-Table-Ready object
     const preppedSurvey = { name: surveyName };
     const preppedQuestions: NewQuestion[] = questions.map((question, idx) => ({
@@ -99,7 +99,7 @@ export default function NewSurveyForm() {
       <button className="btn w-fit" onClick={addNewQuestion}>
         Add Question
       </button>
-      <button className="btn w-20" onClick={clickSubmitFunction()}>
+      <button className="btn w-20" onClick={clickSubmitFunction}>
         Submit
       </button>
     </div>

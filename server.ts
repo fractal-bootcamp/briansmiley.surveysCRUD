@@ -23,6 +23,7 @@ app.post(
       });
       newlyCreatedAnswers.push(createdAnswer);
     }
+    console.log(newlyCreatedAnswers);
     res.json(newlyCreatedAnswers);
   }
 );
