@@ -46,6 +46,7 @@ const postResponsesToDatabase = async (
   if (response.ok) return await response.text();
   else return response.statusText;
 };
+
 const newEmptySurveyResponseLocal = (
   questionId: Question["id"]
 ): SurveyResponseLocal => ({
@@ -57,6 +58,7 @@ export default function SurveyFilloutForm() {
   const [surveyName, setSurveyName] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<SurveyResponseLocal[]>([]);
+
   const resetAnswersState = () => {
     const newAnswers = Array.from(questions, question =>
       newEmptySurveyResponseLocal(question.id)
@@ -64,13 +66,12 @@ export default function SurveyFilloutForm() {
     setAnswers(newAnswers);
   };
   const params = useParams();
-  if (!params.surveyId) throw new Error("invalid surveyId");
   const surveyId = params.surveyId;
 
   //async useEffect to get the survey content into state
   useEffect(() => {
     const asyncGetSurveys = async () => {
-      const { survey, questions } = await fetchSurvey(surveyId);
+      const { survey, questions } = await fetchSurvey(surveyId!);
       setSurveyName(survey.name);
       setQuestions(questions);
       const newAnswers = Array.from(questions, question =>
@@ -168,4 +169,8 @@ const QuestionResponseRow = ({
       </div>
     </div>
   );
+};
+
+const SubmissionResponse = ({ result }: { result: boolean }) => {
+  return <div className="bg-green-700 text-white rounded-xl"></div>;
 };

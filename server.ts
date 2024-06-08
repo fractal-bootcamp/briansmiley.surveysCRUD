@@ -84,7 +84,8 @@ app.get("/surveys/:surveyId", async (req: Request, res: Response) => {
     //   name: true
     // }
   });
-  res.json({ survey });
+  if (survey === null) res.status(404).send("Survey not found");
+  else res.json({ survey });
 });
 //get all surveys
 app.get("/surveys", async (req: Request, res: Response) => {
