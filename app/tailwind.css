@@ -7,7 +7,7 @@ body {
   height: 100%;
 }
 .inp {
-  @apply border border-gray-600 rounded-md;
+  @apply border border-gray-600 rounded-md px-1;
 }
 
 .btn {
