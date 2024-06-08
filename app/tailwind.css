@@ -6,10 +6,12 @@ html,
 body {
   height: 100%;
 }
-.inp {
-  @apply border border-gray-600 rounded-md px-1;
-}
+@layer components {
+  .inp {
+    @apply border border-gray-600 rounded-md px-1;
+  }
 
-.btn {
-  @apply border border-gray-500 py-0.5 px-1 rounded-md bg-slate-100 hover:bg-slate-200;
+  .btn {
+    @apply border border-gray-500 flex items-center justify-center py-0.5 px-1 rounded-md bg-slate-100 hover:bg-slate-200;
+  }
 }

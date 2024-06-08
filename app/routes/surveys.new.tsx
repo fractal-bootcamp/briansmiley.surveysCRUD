@@ -58,13 +58,15 @@ export default function NewSurveyForm() {
     setQuestions(newQuestions);
   };
   return (
-    <div className="flex flex-col gap-2">
-      <div className="m-2 flex gap-2">
-        <label htmlFor="Survey Name">Survey Name</label>
+    <div className="flex flex-col gap-2 p-2">
+      <div className=" flex gap-2">
+        <label htmlFor="surveyName" className="shrink-0">
+          Survey Name
+        </label>
         <input
           className="inp"
           type="text"
-          name="surveyName"
+          id="surveyName"
           value={surveyName}
           onChange={e => {
             setSurveyName(e.target.value);
@@ -72,7 +74,7 @@ export default function NewSurveyForm() {
         ></input>
       </div>
 
-      <div>
+      <div className="flex flex-col gap-2">
         {questions.map((question, idx) => (
           <QuestionRow
             question={question}
@@ -109,16 +111,22 @@ const QuestionRow = ({
   deleteQuestionFunction
 }: QuestionRowProps) => {
   return (
-    <div className="m-2 flex gap-2" key={index}>
-      <label htmlFor={`Question ${index}`}>{`Question ${index + 1}`}</label>
+    <div className=" flex gap-2 items-center">
+      <label
+        htmlFor={`question${index}`}
+        className="shrink-0 w-[6em]"
+      >{`Question ${index + 1}:`}</label>
       <input
         className="inp"
         type="text"
-        name={`question${index}`}
+        id={`question${index}`}
         value={question}
         onChange={onChangeFunction}
       />
-      <button className="btn w-8 bg-red-300" onClick={deleteQuestionFunction}>
+      <button
+        className="btn bg-red-400 hover:bg-red-600 h-[75%] w-6"
+        onClick={deleteQuestionFunction}
+      >
         -
       </button>
     </div>
