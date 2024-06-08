@@ -9,6 +9,7 @@ const port = 4000;
 app.use(cors());
 app.use(express.json());
 
+//create a new survey
 app.post(
   "/create",
   async (req: Request<{}, {}, NewSurveyPostParams>, res: Response) => {
@@ -42,11 +43,41 @@ app.post(
     res.json({ newlyCreatedSurvey, newlyCreatedQuestions });
   }
 );
+
+//get all questions tied to a survey
+app.get("/surveys/:surveyId/questions", async (req: Request, res: Response) => {
+  const questions = await prisma.question.findMany({
+    where: {
+      surveyId: {
+        equals: req.params.surveyId
+      }
+    }
+  });
+  res.json({ questions });
+});
+//get one survey
+app.get("/surveys/:surveyId", async (req: Request, res: Response) => {
+  const survey = await prisma.survey.findUnique({
+    where: {
+      id: req.params.surveyId
+    }
+    // select: {
+    //   name: true
+    // }
+  });
+  res.json({ survey });
+});
+//get all surveys
 app.get("/surveys", async (req: Request, res: Response) => {
   const surveys = await prisma.survey.findMany();
 
   res.json({ surveys });
 });
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Running express server here");
+});
+
 app.listen(port, () => {
   console.log(`Express running on post ${port}`);
 });
