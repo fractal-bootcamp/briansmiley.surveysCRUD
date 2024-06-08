@@ -21,6 +21,7 @@ const addNewSurveyToDatabase = async (survey: NewSurveyParams) => {
   if (response.ok) return await response.text();
   else return response.statusText;
 };
+
 export default function NewSurveyForm() {
   const [surveyName, setSurveyName] = useState("");
   const clickSubmitFunction = (surveyName: string) => () => {
@@ -31,9 +32,11 @@ export default function NewSurveyForm() {
   return (
     <div className="">
       <div className="m-2 flex gap-2">
+        <label htmlFor="Survey Name">Survey Name</label>
         <input
           className="inp"
           type="text"
+          name="surveyName"
           value={surveyName}
           onChange={e => {
             setSurveyName(e.target.value);
