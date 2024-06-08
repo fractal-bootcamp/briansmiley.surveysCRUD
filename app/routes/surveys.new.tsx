@@ -81,9 +81,7 @@ export default function NewSurveyForm() {
           type="text"
           id="surveyName"
           value={surveyName}
-          onChange={e => {
-            setSurveyName(e.target.value);
-          }}
+          onChange={e => setSurveyName(e.target.value)}
         ></input>
       </div>
 
