@@ -19,10 +19,10 @@ model Survey {
 }
 
 model Question {
-  id       String           @id @default(cuid())
-  question String
-  content  String
-  response SurveyResponse[]
+  id             String           @id @default(cuid())
+  questionNumber Int
+  content        String
+  response       SurveyResponse[]
 }
 
 model SurveyResponse {
