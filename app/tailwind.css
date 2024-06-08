@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+.inp {
+  @apply border border-gray-600 rounded-md;
+}
+
+.btn {
+  @apply border border-gray-500 py-0.5 px-1 rounded-md;
+}

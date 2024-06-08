@@ -8,9 +8,5 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  return (
-    <div className="text-5xl text-teal-500 underline">
-      <Link to="/surveys">Surveys</Link>
-    </div>
-  );
+  return <></>;
 }

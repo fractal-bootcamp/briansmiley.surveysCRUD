@@ -5,6 +5,7 @@ import {
   Scripts,
   ScrollRestoration
 } from "@remix-run/react";
+import Sidebar from "./components/Sidebar";
 import "./tailwind.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -17,7 +18,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <div className="flex flex-row h-full">
+          <Sidebar />
+          {children}
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>

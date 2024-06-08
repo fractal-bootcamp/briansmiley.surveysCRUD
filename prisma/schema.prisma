@@ -15,18 +15,21 @@ datasource db {
 
 model Survey {
   id   String @id @default(cuid())
-  Name String
+  name String
 }
 
 model Question {
-  id       String     @id @default(cuid())
-  Question String
-  Content  String
-  Rseponse Response[]
+  id       String           @id @default(cuid())
+  question String
+  content  String
+  response SurveyResponse[]
 }
 
-model Response {
+model SurveyResponse {
   id         String   @id @default(cuid())
-  Question   Question @relation(fields: [questionId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
   questionId String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
