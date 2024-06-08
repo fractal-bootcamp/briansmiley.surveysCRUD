@@ -10,6 +10,9 @@
   a {
     @apply lnk;
   }
+  h1 {
+    @apply font-semibold text-2xl;
+  }
 }
 @layer components {
   .inp {
