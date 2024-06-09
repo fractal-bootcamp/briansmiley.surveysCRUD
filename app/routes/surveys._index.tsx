@@ -59,7 +59,7 @@ export default function SurveyList() {
     }
   };
   return (
-    <div className="flex flex-col w-[200px]">
+    <div className="flex flex-col w-[500px]">
       {surveys.map((survey, idx) => {
         //alternate row backgrounds
         const background = idx % 2 ? "bg-[#FBFBFB]" : "bg-slate-200";
@@ -81,7 +81,7 @@ export default function SurveyList() {
                 Results
               </Link>
             </div>
-            <div className="">
+            <div className="flex flex-row justify-end items-center grow h-full">
               <Trash2Icon
                 className="cursor-pointer h-4"
                 stroke="gray"
