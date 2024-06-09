@@ -22,8 +22,8 @@ const addNewSurveyToDatabase = async (newSurvey: NewSurveyPostParams) => {
 export default function NewSurveyForm() {
   const [surveyName, setSurveyName] = useState("");
   const [questions, setQuestions] = useState<string[]>([""]);
-  const surveyNameInput = useRef<HTMLInputElement>(null); //get a reference to the survey input so we can focus it
   const [nameRequiredWarning, setNameRequiredWarning] = useState(false);
+  const surveyNameInput = useRef<HTMLInputElement>(null); //get a reference to the survey input so we can focus it
 
   //on-click to send the state variables off to db
   const clickSubmitFunction = () => {
@@ -145,14 +145,18 @@ const QuestionRow = ({
         value={question}
         onChange={onChangeFunction}
       />
-      <div className="flex items-center h-full">
-        <button
-          className="btn bg-red-400 hover:bg-red-600 h-[25px] w-6"
-          onClick={deleteQuestionFunction}
-        >
-          -
-        </button>
-      </div>
+      {index ? (
+        <div className="flex items-center h-full">
+          <button
+            className="btn bg-red-400 hover:bg-red-600 h-[25px] w-6"
+            onClick={deleteQuestionFunction}
+          >
+            -
+          </button>
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
