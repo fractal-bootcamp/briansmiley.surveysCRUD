@@ -62,6 +62,16 @@ app.post(
     res.json({ newlyCreatedSurvey, newlyCreatedQuestions });
   }
 );
+//removes a survey and its quetions and their answers from the database
+app.delete("/surveys/:surveyId/delete", async (req: Request, res: Response) => {
+  const surveyId = req.params.surveyId;
+  const deleteSurvey = prisma.survey.delete({
+    where: {
+      id: req.params.surveyId
+    }
+  });
+  res.json(deleteSurvey);
+});
 
 //get all questions tied to a survey
 app.get("/surveys/:surveyId/questions", async (req: Request, res: Response) => {
