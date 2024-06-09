@@ -21,6 +21,7 @@ export type SurveyResponsePostBody = {
   answers: SurveyResponseLocal[];
 };
 
+//get Survey and its questions from the Database
 const fetchSurvey = async (
   surveyId: string
 ): Promise<SurveyWithQuestionsFetchResponse> => {
@@ -35,7 +36,7 @@ const fetchSurvey = async (
   return { survey, questions };
 };
 
-//
+//send submitted answers to the database
 const postResponsesToDatabase = async (
   newSurveyResponses: SurveyResponsePostBody
 ): Promise<PostResponseOutput> => {
@@ -48,6 +49,7 @@ const postResponsesToDatabase = async (
   return responseOutput;
 };
 
+//make a new populable SurveyResponse object associated to a passed in survey question, initialized with a blank answer
 const newEmptySurveyResponseLocal = (
   questionId: Question["id"]
 ): SurveyResponseLocal => ({
@@ -55,6 +57,7 @@ const newEmptySurveyResponseLocal = (
   responseContent: ""
 });
 
+//the survey submission page, which can display either the survey form or splash for submission result
 export default function SurveySubmissionPage() {
   const [submissionStatus, setSubmissionStatus] = useState({
     submitted: false,
@@ -62,14 +65,16 @@ export default function SurveySubmissionPage() {
     response: {}
   });
 
+  // function passed in to the survey form component to set the submission status/result once submit is clicked
   const submissionStatusSetter = (postResponse: PostResponseOutput) => {
     setSubmissionStatus({
-      submitted: true,
-      status: postResponse.ok,
-      response: postResponse.json
+      submitted: true, //always sets submitted to true; it's called when submit is hit
+      status: postResponse.ok, //whether the post came back with a success code
+      response: postResponse.json //the content of the fetch response from posting the answers
     });
   };
 
+  //if the form was submitted, we render Success/Failure depending on ok status
   return submissionStatus.submitted ? (
     submissionStatus.status ? (
       <SuccessSplash />
@@ -77,16 +82,17 @@ export default function SurveySubmissionPage() {
       <FailureSplash responseJson={submissionStatus.response} />
     )
   ) : (
-    <SurveyFilloutForm submissionFunction={submissionStatusSetter} />
+    <SurveyFilloutForm submissionFunction={submissionStatusSetter} /> //otherwise render the survey form and pass in the submission status setter
   );
 }
 
 type SurveyFilloutFormProps = {
   submissionFunction: (res: PostResponseOutput) => void;
 };
+
 type PostResponseOutput = {
-  json: {};
-  ok: boolean;
+  json: {}; //the json body of the post response
+  ok: boolean; //whether the post fetch returned ok
 };
 const SurveyFilloutForm = ({ submissionFunction }: SurveyFilloutFormProps) => {
   const [surveyName, setSurveyName] = useState<string>("");
@@ -102,12 +108,15 @@ const SurveyFilloutForm = ({ submissionFunction }: SurveyFilloutFormProps) => {
   const params = useParams();
   const surveyId = params.surveyId;
 
-  //async useEffect to get the survey content into state
+  //async useEffect to get the survey content and an initialized blank set of answers into state
   useEffect(() => {
+    //useEffect only takes a syncronous funciton, so we have to define and call an async inside it to await the survey fetch
     const asyncGetSurveys = async () => {
       const { survey, questions } = await fetchSurvey(surveyId!);
       setSurveyName(survey.name);
       setQuestions(questions);
+
+      //each question is mapped to a blank answer tied to its id
       const newAnswers = Array.from(questions, question =>
         newEmptySurveyResponseLocal(question.id)
       );
@@ -116,35 +125,40 @@ const SurveyFilloutForm = ({ submissionFunction }: SurveyFilloutFormProps) => {
     asyncGetSurveys();
   }, []);
 
+  //for passing as the onChange prop of an answers textarea to associate user input with answers state
   const updateAnswerByQuestionIdFunction = (
     questionId: Question["id"],
     textarea: HTMLTextAreaElement
   ) => {
+    //create SurveyResponse object
     const newAnswer = {
       questionId: questionId,
       responseContent: textarea.value
     };
+
+    //OnChange may as well simultaneously resize textarea to fit question (to a point)
     const maxTextareaHeight = 300;
-    //Resize textarea to fit question (to a point)
-    textarea.style.height = "auto";
+    textarea.style.height = "auto"; //I think we need to set height to auto first in order for textarea.scrollHeight to work in the next line
     textarea.style.height = `${Math.min(
       textarea.scrollHeight,
       maxTextareaHeight
     )}px`;
-    //set questions to new content
+
+    //set state answers array to include the change
     setAnswers(
       answers.map(answer =>
         answer.questionId === questionId ? newAnswer : answer
       )
     );
   };
+
+  //callback for the Submit survey button
   const submitSurveyAnswersButtonFunction = async () => {
-    const postResponse = await postResponsesToDatabase({ answers });
-    resetAnswersState();
-    //perform the passed in funciton to perform after submission
-    console.log(submissionFunction);
-    submissionFunction(postResponse);
+    const postResponse = await postResponsesToDatabase({ answers }); //send the answers array to database
+    resetAnswersState(); //reset the answers array to empty answers (this is pointless since we redirect but feels clea and might be useful for future behaviour)
+    submissionFunction(postResponse); //perform the main component's passed in state function to pass our post action/results back up
   };
+
   return (
     <div className="flex flex-col m-2 gap-2">
       <h1>{surveyName}</h1>
@@ -175,6 +189,8 @@ const SurveyFilloutForm = ({ submissionFunction }: SurveyFilloutFormProps) => {
     </div>
   );
 };
+
+//component for displaying quesitons and their answer boxes
 type QuestionResponseRowProps = {
   question: Question;
   answer: SurveyResponseLocal;
@@ -206,8 +222,4 @@ const QuestionResponseRow = ({
       </div>
     </div>
   );
-};
-
-const SubmissionResponse = ({ result }: { result: boolean }) => {
-  return <div className="bg-green-700 text-white rounded-xl"></div>;
 };
