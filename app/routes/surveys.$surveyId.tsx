@@ -1,7 +1,9 @@
 import { fetcher } from "./surveys._index";
 import { Survey, Question, SurveyResponse } from "@prisma/client";
-import { useParams } from "@remix-run/react";
+import { redirect, useParams } from "@remix-run/react";
 import { ChangeEventHandler, useEffect, useState } from "react";
+import FailureSplash from "~/components/FailureSplash";
+import SuccessSplash from "~/components/SuccessSplash";
 
 type SingleSurveyFetchResponse = { survey: Survey };
 type QuestionListFetchResponse = { questions: Question[] };
@@ -36,16 +38,16 @@ const fetchSurvey = async (
 //
 const postResponsesToDatabase = async (
   newSurveyResponses: SurveyResponsePostBody
-) => {
+): Promise<PostResponseOutput> => {
   const response = await fetch(`http://localhost:4000/answers/submit`, {
     method: "POST",
     body: JSON.stringify(newSurveyResponses),
     headers: new Headers({ "content-type": "application/json" })
   });
-
-  if (response.ok) return await response.text();
-  else return response.statusText;
+  const responseOutput = { json: await response.json(), ok: response.ok };
+  return responseOutput;
 };
+
 const newEmptySurveyResponseLocal = (
   questionId: Question["id"]
 ): SurveyResponseLocal => ({
@@ -53,10 +55,44 @@ const newEmptySurveyResponseLocal = (
   responseContent: ""
 });
 
-export default function SurveyFilloutForm() {
+export default function SurveySubmissionPage() {
+  const [submissionStatus, setSubmissionStatus] = useState({
+    submitted: false,
+    status: false,
+    response: {}
+  });
+
+  const submissionStatusSetter = (postResponse: PostResponseOutput) => {
+    setSubmissionStatus({
+      submitted: true,
+      status: postResponse.ok,
+      response: postResponse.json
+    });
+  };
+
+  return submissionStatus.submitted ? (
+    submissionStatus.status ? (
+      <SuccessSplash />
+    ) : (
+      <FailureSplash responseJson={submissionStatus.response} />
+    )
+  ) : (
+    <SurveyFilloutForm submissionFunction={submissionStatusSetter} />
+  );
+}
+
+type SurveyFilloutFormProps = {
+  submissionFunction: (res: PostResponseOutput) => void;
+};
+type PostResponseOutput = {
+  json: {};
+  ok: boolean;
+};
+const SurveyFilloutForm = ({ submissionFunction }: SurveyFilloutFormProps) => {
   const [surveyName, setSurveyName] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<SurveyResponseLocal[]>([]);
+
   const resetAnswersState = () => {
     const newAnswers = Array.from(questions, question =>
       newEmptySurveyResponseLocal(question.id)
@@ -64,13 +100,12 @@ export default function SurveyFilloutForm() {
     setAnswers(newAnswers);
   };
   const params = useParams();
-  if (!params.surveyId) throw new Error("invalid surveyId");
   const surveyId = params.surveyId;
 
   //async useEffect to get the survey content into state
   useEffect(() => {
     const asyncGetSurveys = async () => {
-      const { survey, questions } = await fetchSurvey(surveyId);
+      const { survey, questions } = await fetchSurvey(surveyId!);
       setSurveyName(survey.name);
       setQuestions(questions);
       const newAnswers = Array.from(questions, question =>
@@ -103,9 +138,12 @@ export default function SurveyFilloutForm() {
       )
     );
   };
-  const submitSurveyAnswersButtonFunction = () => {
-    postResponsesToDatabase({ answers });
+  const submitSurveyAnswersButtonFunction = async () => {
+    const postResponse = await postResponsesToDatabase({ answers });
     resetAnswersState();
+    //perform the passed in funciton to perform after submission
+    console.log(submissionFunction);
+    submissionFunction(postResponse);
   };
   return (
     <div className="flex flex-col m-2 gap-2">
@@ -136,7 +174,7 @@ export default function SurveyFilloutForm() {
       </button>
     </div>
   );
-}
+};
 type QuestionResponseRowProps = {
   question: Question;
   answer: SurveyResponseLocal;
@@ -168,4 +206,8 @@ const QuestionResponseRow = ({
       </div>
     </div>
   );
+};
+
+const SubmissionResponse = ({ result }: { result: boolean }) => {
+  return <div className="bg-green-700 text-white rounded-xl"></div>;
 };
