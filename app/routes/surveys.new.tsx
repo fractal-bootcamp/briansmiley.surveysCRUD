@@ -1,5 +1,5 @@
 import { Question, Survey } from "@prisma/client";
-import { ChangeEvent, ChangeEventHandler, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useRef, useState } from "react";
 
 export type NewSurvey = Omit<Survey, "id">;
 export type NewQuestion = Omit<Question, "id" | "surveyId">;
@@ -22,9 +22,18 @@ const addNewSurveyToDatabase = async (newSurvey: NewSurveyPostParams) => {
 export default function NewSurveyForm() {
   const [surveyName, setSurveyName] = useState("");
   const [questions, setQuestions] = useState<string[]>([""]);
+  const [nameRequiredWarning, setNameRequiredWarning] = useState(false);
+  const surveyNameInput = useRef<HTMLInputElement>(null); //get a reference to the survey input so we can focus it
 
   //on-click to send the state variables off to db
   const clickSubmitFunction = () => {
+    //if surveyName is blank, stop the submission, focus the input, and start showing the Name Required warning
+    if (surveyName === "") {
+      if (surveyNameInput.current) surveyNameInput.current.focus();
+      setNameRequiredWarning(true);
+      return;
+    }
+
     //turn questions array into array of Question-table-ready-objects and the survey name into a Survey-Table-Ready object
     const preppedSurvey = { name: surveyName };
     const preppedQuestions: NewQuestion[] = questions.map((question, idx) => ({
@@ -32,6 +41,7 @@ export default function NewSurveyForm() {
       content: question
     }));
 
+    //add the new survey to the database
     addNewSurveyToDatabase({
       newSurvey: preppedSurvey,
       newSurveyQuestions: preppedQuestions
@@ -78,11 +88,15 @@ export default function NewSurveyForm() {
         </label>
         <input
           className="inp"
+          ref={surveyNameInput}
           type="text"
           id="surveyName"
           value={surveyName}
           onChange={e => setSurveyName(e.target.value)}
         ></input>
+        <div className="text-red-500 h-fit">
+          {surveyName == "" && nameRequiredWarning ? "Name required" : ""}
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -131,14 +145,18 @@ const QuestionRow = ({
         value={question}
         onChange={onChangeFunction}
       />
-      <div className="flex items-center h-full">
-        <button
-          className="btn bg-red-400 hover:bg-red-600 h-[25px] w-6"
-          onClick={deleteQuestionFunction}
-        >
-          -
-        </button>
-      </div>
+      {index ? (
+        <div className="flex items-center h-full">
+          <button
+            className="btn bg-red-400 hover:bg-red-600 h-[25px] w-6"
+            onClick={deleteQuestionFunction}
+          >
+            -
+          </button>
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
