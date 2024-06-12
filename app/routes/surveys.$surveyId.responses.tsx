@@ -13,7 +13,7 @@ const SurveyResultsTable = () => {
   const surveyData: SurveyData = useOutletContext();
   return (
     <div>
-      Test
+      <div className="text-2xl">{surveyData.name}</div>
       {surveyData.Questions.map(question => (
         <QuestionResponseBlock question={question} key={question.id} />
       ))}
@@ -27,8 +27,33 @@ const QuestionResponseBlock = ({
   question: SurveyData["Questions"][number];
 }) => {
   //Render a question with all its answers
-  //Justrendering the questions for now
-  return <div>{question.content}</div>;
+  return (
+    <div>
+      <h2 className="font-semibold text-gray-600 text-lg">
+        {question.content}
+      </h2>
+      <div className="flex">
+        {/**spacer div on the left of the answers for each block */}
+        <div className="w-[20px]"></div>
+        <ul>
+          {question.Responses.map(response => (
+            <ResponseBlock
+              content={response.responseContent}
+              key={response.id}
+            />
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+//COntains one question response
+//prettier-ignore
+const ResponseBlock = ({content}: {
+  content: SurveyResponse["responseContent"];
+}) => {
+  return <li>•{content}</li>;
 };
 
 export default SurveyResultsTable;
