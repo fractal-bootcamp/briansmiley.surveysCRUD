@@ -107,14 +107,6 @@ app.get("/surveys", async (req: Request, res: Response) => {
   res.json({ surveys });
 });
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Running express server here");
-});
-
-app.listen(port, () => {
-  console.log(`Express running on post ${port}`);
-});
-
 //sends an array of a surveys answers and which questions they go with
 app.get("/responses/:surveyId/", async (req: Request, res: Response) => {
   //extrac the survey we care about
@@ -132,4 +124,11 @@ app.get("/responses/:surveyId/", async (req: Request, res: Response) => {
     }
   });
   res.json(answers);
+});
+app.get("/", (req: Request, res: Response) => {
+  res.send("Running express server here");
+});
+
+app.listen(port, () => {
+  console.log(`Express running on post ${port}`);
 });
