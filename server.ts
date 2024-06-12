@@ -1,32 +1,28 @@
-import express, { Express, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { Question, Survey, SurveyResponse } from "@prisma/client";
 import { NewSurveyPostParams } from "~/routes/surveys.new";
 import prisma from "~/client";
 import cors from "cors";
-import { SurveyResponsePostBody } from "~/routes/surveys.$surveyId";
 const app = express();
 const port = 4000;
 
 app.use(cors());
 app.use(express.json());
 
-app.post(
-  "/answers/submit",
-  async (req: Request<{}, {}, SurveyResponsePostBody>, res: Response) => {
-    const body = req.body;
-    console.log(body);
-    const { answers } = body;
-    const newlyCreatedAnswers = [];
-    for (const newAnswer of answers) {
-      const createdAnswer = await prisma.surveyResponse.create({
-        data: newAnswer
-      });
-      newlyCreatedAnswers.push(createdAnswer);
-    }
-    console.log(newlyCreatedAnswers);
-    res.json(newlyCreatedAnswers);
+app.post("/answers/submit", async (req: Request, res: Response) => {
+  const body = req.body;
+  console.log(body);
+  const { answers } = body;
+  const newlyCreatedAnswers = [];
+  for (const newAnswer of answers) {
+    const createdAnswer = await prisma.surveyResponse.create({
+      data: newAnswer
+    });
+    newlyCreatedAnswers.push(createdAnswer);
   }
-);
+  console.log(newlyCreatedAnswers);
+  res.json(newlyCreatedAnswers);
+});
 
 //create a new survey
 app.post(
@@ -87,7 +83,7 @@ app.get("/surveys/:surveyId/questions", async (req: Request, res: Response) => {
   });
   res.json({ questions });
 });
-//get one survey
+//get one surveyId
 app.get("/surveys/:surveyId", async (req: Request, res: Response) => {
   const survey = await prisma.survey.findUnique({
     where: {
@@ -107,6 +103,43 @@ app.get("/surveys", async (req: Request, res: Response) => {
   res.json({ surveys });
 });
 
+/**
+ * Fetch an entire survey and its questions and answers
+ */
+app.get("/surveys/:surveyId/full", async (req: Request, res: Response) => {
+  const surveyId = req.params.surveyId;
+  //find the survey with surveyId, and bundle all its questions and each question's answers
+  const fetchedSurveyData = await prisma.survey.findUnique({
+    where: { id: surveyId },
+    include: {
+      Questions: {
+        include: {
+          Responses: true
+        }
+      }
+    }
+  });
+  res.json(fetchedSurveyData);
+});
+
+//sends an array of a surveys answers and which questions they go with
+app.get("/responses/:surveyId/", async (req: Request, res: Response) => {
+  //extrac the survey we care about
+  const surveyId = req.params.surveyId;
+
+  // select the answers whose questions have a surveyId that matches the input parameter
+  const answers = await prisma.surveyResponse.findMany({
+    where: {
+      question: { surveyId }
+    },
+    //include the questionId and answer content on the returned array
+    select: {
+      questionId: true,
+      responseContent: true
+    }
+  });
+  res.json(answers);
+});
 app.get("/", (req: Request, res: Response) => {
   res.send("Running express server here");
 });

@@ -14,9 +14,9 @@ datasource db {
 }
 
 model Survey {
-  id       String     @id @default(cuid())
-  name     String
-  Question Question[]
+  id        String     @id @default(cuid())
+  name      String
+  Questions Question[]
 }
 
 model Question {
@@ -25,7 +25,7 @@ model Question {
   content        String
   survey         Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   surveyId       String
-  response       SurveyResponse[]
+  Responses      SurveyResponse[]
 }
 
 model SurveyResponse {
