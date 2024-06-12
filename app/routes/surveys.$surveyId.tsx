@@ -44,10 +44,8 @@ const SurveyIdPage = () => {
       {surveyData === "pending" ? (
         "Loading..."
       ) : surveyData === null ? (
-        // <div className="flex w-full justify-center items-center">
         <FailureSplash errorMessage="Survey id not found" />
       ) : (
-        // </div>
         <Outlet context={surveyData} />
       )}
     </>
