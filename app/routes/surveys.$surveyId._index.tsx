@@ -1,16 +1,10 @@
 import { fetcher } from "./surveys._index";
 import { Survey, Question, SurveyResponse } from "@prisma/client";
-import { redirect, useParams } from "@remix-run/react";
+import { redirect, useOutletContext, useParams } from "@remix-run/react";
 import { ChangeEventHandler, useEffect, useState } from "react";
 import FailureSplash from "~/components/FailureSplash";
 import SuccessSplash from "~/components/SuccessSplash";
-
-type SingleSurveyFetchResponse = { survey: Survey };
-type QuestionListFetchResponse = { questions: Question[] };
-type SurveyWithQuestionsFetchResponse = {
-  survey: Survey;
-  questions: Question[];
-};
+import { FetchedSurveyData } from "./surveys.$surveyId";
 
 export type SurveyResponseLocal = Omit<
   SurveyResponse,
@@ -19,21 +13,6 @@ export type SurveyResponseLocal = Omit<
 
 export type SurveyResponsePostBody = {
   answers: SurveyResponseLocal[];
-};
-
-//get Survey and its questions from the Database
-const fetchSurvey = async (
-  surveyId: string
-): Promise<SurveyWithQuestionsFetchResponse> => {
-  const surveyFetchResponse = await fetcher<SingleSurveyFetchResponse>(() =>
-    fetch(`http://localhost:4000/surveys/${surveyId}`)
-  );
-  const survey = surveyFetchResponse.survey;
-  const questionsFetchResponse = await fetcher<QuestionListFetchResponse>(() =>
-    fetch(`http://localhost:4000/surveys/${surveyId}/questions`)
-  );
-  const questions = questionsFetchResponse.questions;
-  return { survey, questions };
 };
 
 //send submitted answers to the database
@@ -95,36 +74,21 @@ type PostResponseOutput = {
   ok: boolean; //whether the post fetch returned ok
 };
 const SurveyFilloutForm = ({ submissionFunction }: SurveyFilloutFormProps) => {
-  const [surveyName, setSurveyName] = useState<string>("");
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<SurveyResponseLocal[]>([]);
 
+  /** Survey data should always be populated if we are loading this page; otherwise parent node would be pending/failed */
+  const surveyData: FetchedSurveyData = useOutletContext()!;
+  const questions = surveyData.Questions.map(({ Responses, ...rest }) => rest); //strip the responses out for data simplicity
+  const surveyName = surveyData.name;
+
+  /** Set the answers state array to an empty one of length questions.length */
   const resetAnswersState = () => {
     const newAnswers = Array.from(questions, question =>
       newEmptySurveyResponseLocal(question.id)
     );
     setAnswers(newAnswers);
   };
-  const params = useParams();
-  const surveyId = params.surveyId;
-
-  //async useEffect to get the survey content and an initialized blank set of answers into state
-  useEffect(() => {
-    //useEffect only takes a syncronous funciton, so we have to define and call an async inside it to await the survey fetch
-    const asyncGetSurveys = async () => {
-      const { survey, questions } = await fetchSurvey(surveyId!);
-      setSurveyName(survey.name);
-      setQuestions(questions);
-
-      //each question is mapped to a blank answer tied to its id
-      const newAnswers = Array.from(questions, question =>
-        newEmptySurveyResponseLocal(question.id)
-      );
-      setAnswers(newAnswers);
-    };
-    asyncGetSurveys();
-  }, []);
-
+  useEffect(() => resetAnswersState(), []);
   //for passing as the onChange prop of an answers textarea to associate user input with answers state
   const updateAnswerByQuestionIdFunction = (
     questionId: Question["id"],
@@ -164,13 +128,10 @@ const SurveyFilloutForm = ({ submissionFunction }: SurveyFilloutFormProps) => {
       <h1>{surveyName}</h1>
       <div>
         {questions.map(question => {
-          const questionAnswer = answers.find(
-            answer => answer.questionId === question.id
-          );
-          if (!questionAnswer)
-            throw new Error(
-              `Failed a lookup of answer <===> question on question ${question.id}, answer array is currently ${answers.length} long`
-            );
+          /**  */
+          const questionAnswer =
+            answers.find(answer => answer.questionId === question.id) ||
+            newEmptySurveyResponseLocal(question.id);
           return (
             <QuestionResponseRow
               question={question}
