@@ -12,8 +12,8 @@ const SurveyResultsTable = () => {
    */
   const surveyData: SurveyData = useOutletContext();
   return (
-    <div>
-      <div className="text-2xl">{surveyData.name}</div>
+    <div className="flex flex-col gap-2 m-6">
+      <div className="text-2xl font-bold mb-2">{surveyData.name}</div>
       {surveyData.Questions.map(question => (
         <QuestionResponseBlock question={question} key={question.id} />
       ))}
