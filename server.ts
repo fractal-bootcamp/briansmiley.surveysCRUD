@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { Question, Survey, SurveyResponse } from "@prisma/client";
 import { NewSurveyPostParams } from "~/routes/surveys.new";
 import prisma from "~/client";
@@ -113,4 +113,23 @@ app.get("/", (req: Request, res: Response) => {
 
 app.listen(port, () => {
   console.log(`Express running on post ${port}`);
+});
+
+//sends an array of a surveys answers and which questions they go with
+app.get("/responses/:surveyId/", async (req: Request, res: Response) => {
+  //extrac the survey we care about
+  const surveyId = req.params.surveyId;
+
+  // select the answers whose questions have a surveyId that matches the input parameter
+  const answers = await prisma.surveyResponse.findMany({
+    where: {
+      question: { surveyId }
+    },
+    //include the questionId and answer content on the returned array
+    select: {
+      questionId: true,
+      responseContent: true
+    }
+  });
+  res.json(answers);
 });
